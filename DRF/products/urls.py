@@ -3,7 +3,8 @@ from products.views import *
 
 
 urlpatterns = [
-    path('',product_list_create),
+    path('',productview),
     path('<int:pk>',product_detail,name='product_detail'),
-    path('profile/<int:pk>',product_list_create)
+    path('profile',product_list_create),
+    path('follow/<int:pk>',follow_view)
 ]

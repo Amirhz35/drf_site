@@ -14,3 +14,13 @@ class ProductSerializer(serializers.ModelSerializer):
             'content', 
             'price'
         ]
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = [
+            'follower',
+            'followeing',
+            'created_at'
+        ]
