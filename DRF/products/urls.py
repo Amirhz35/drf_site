@@ -9,5 +9,6 @@ urlpatterns = [
     path('follow',follow_view),
     path('some',something),
     path('followers',getfollowers),
-    path('following',getfollowing)
+    path('following',getfollowing),
+    path('posts',getpost)
 ]

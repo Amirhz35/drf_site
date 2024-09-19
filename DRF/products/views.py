@@ -10,12 +10,12 @@ from django.forms.models import model_to_dict
 
 from .models import *
 from .serializers import *
-from .getquery import GetQuerySet
+from .getquery import *
 from .mixins import PermissionMixins
 # Create your views here.
 
 class ProductListCreateView(
-    GetQuerySet,
+    GetProductQuerySet,
     PermissionMixins,
     generics.ListCreateAPIView):
     queryset = Product.objects.all()
@@ -73,7 +73,7 @@ something = SomeThingsView.as_view()
         return Response({"errors":serializer.errors},status=status.HTTP_400_BAD_REQUEST)"""
 
 class FollowAPIView(
-    GetQuerySet,
+    GetFollowQuerySet,
     PermissionMixins,
     generics.ListCreateAPIView):
     queryset = Follow.objects.all()
@@ -94,3 +94,10 @@ class GetFollowingAPIView(generics.ListAPIView):
     def get_queryset(self):
         return Follow.objects.filter(follower=self.request.user)
 getfollowing = GetFollowingAPIView.as_view()
+
+class GetPostsAPIView(generics.ListAPIView):
+    serializer_class = ProductSerializer
+    def get_queryset(self):
+        following_user = Follow.objects.filter(follower=self.request.user).values_list('following', flat=True)
+        return Product.objects.filter(user__in=following_user)
+getpost = GetPostsAPIView.as_view()
