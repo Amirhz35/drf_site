@@ -83,19 +83,25 @@ class FollowAPIView(
 follow_view = FollowAPIView.as_view()
 
 
-class GetFollowersAPIView(generics.ListAPIView):
+class GetFollowersAPIView(
+    PermissionMixins,
+    generics.ListAPIView):
     serializer_class = FollowSerializer
     def get_queryset(self):
         return Follow.objects.filter(following=self.request.user)
 getfollowers = GetFollowersAPIView.as_view()
 
-class GetFollowingAPIView(generics.ListAPIView):
+class GetFollowingAPIView(
+    PermissionMixins,
+    generics.ListAPIView):
     serializer_class = FollowSerializer
     def get_queryset(self):
         return Follow.objects.filter(follower=self.request.user)
 getfollowing = GetFollowingAPIView.as_view()
 
-class GetPostsAPIView(generics.ListAPIView):
+class GetPostsAPIView(
+    PermissionMixins,
+    generics.ListAPIView):
     serializer_class = ProductSerializer
     def get_queryset(self):
         following_user = Follow.objects.filter(follower=self.request.user).values_list('following', flat=True)
