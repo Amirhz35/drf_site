@@ -6,5 +6,6 @@ urlpatterns = [
     path('',productview),
     path('<int:pk>',product_detail,name='product_detail'),
     path('profile',product_list_create),
-    path('follow/<int:pk>',follow_view)
+    path('follow',follow_view),
+    path('some',something)
 ]
