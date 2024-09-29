@@ -12,37 +12,9 @@ from .models import *
 from .serializers import *
 from .getquery import *
 from .mixins import PermissionMixins
-# Create your views here.
-
-class ProductListCreateView(
-    GetProductQuerySet,
-    PermissionMixins,
-    generics.ListCreateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    #lookup_field = 'pk'
-    
-    def perform_create(self,serializers):
-        title = serializers.validated_data.get('title')
-        content = serializers.validated_data.get('content') or None
-        if content is None:
-            content = title
-        serializers.save(user=self.request.user,content=content)
-
-product_list_create = ProductListCreateView.as_view()
 
 
-class ProductDetailView(generics.RetrieveAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    lookup_field = 'pk'
-product_detail = ProductDetailView.as_view()
 
-
-class ProductView(generics.ListAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-productview = ProductView.as_view()
 
 class SomeThingsView(APIView):
     def get(self, request):
@@ -107,3 +79,23 @@ class GetPostsAPIView(
         following_user = Follow.objects.filter(follower=self.request.user).values_list('following', flat=True)
         return Product.objects.filter(user__in=following_user)
 getpost = GetPostsAPIView.as_view()
+
+class UNFollowAPIView(
+    #GetFollowQuerySet,
+    PermissionMixins,
+    generics.ListCreateAPIView):
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
+    def get_queryset(self):
+        return Follow.objects.filter(follower=self.request.user)
+    def perform_create(self,serializer):
+        following_user  = self.request.data.get('following')
+
+        try:
+            instance = Follow.objects.get(follower=self.request.user,following_id=following_user)
+            instance.delete()
+            return Response({'user unfollowed successfully'},status=200)
+        except Follow.DoesNotExist:
+            return Response({'you are not following this user'})
+    
+unfollow = UNFollowAPIView.as_view()
