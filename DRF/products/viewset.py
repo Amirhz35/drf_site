@@ -23,5 +23,5 @@ class ProductViewSet(
 
 DetailViewSet = ProductViewSet.as_view({'get': 'retrieve','put': 'update',
     'patch': 'partial_update','delete': 'destroy'})
-ListAndCreatrViewSet = ProductViewSet.as_view({'get':'list', 'post':'create'})
+ListAndCreateViewSet = ProductViewSet.as_view({'get':'list', 'post':'create'})
 
