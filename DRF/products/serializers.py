@@ -16,9 +16,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'price'
         ]
         read_only_fields = ['user']
-#    def create(self,validated_data):
- #       return Product.objects.create(**validated_data)
-
 
 
 class FollowSerializer(serializers.ModelSerializer):
