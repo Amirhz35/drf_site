@@ -10,6 +10,7 @@ from django.forms.models import model_to_dict
 
 from .models import *
 from .serializers import *
+from .tasks import *
 from .getquery import *
 from .mixins import PermissionMixins
 
@@ -108,7 +109,7 @@ class GetPostsAPIView(
         return Response(serializer.data)
 getpost = GetPostsAPIView.as_view()
 
-class UNFollowAPIView(
+'''class UNFollowAPIView(
     #GetFollowQuerySet,
     PermissionMixins,
     generics.ListCreateAPIView):
@@ -125,6 +126,14 @@ class UNFollowAPIView(
             return Response({'user unfollowed successfully'},status=200)
         except Follow.DoesNotExist:
             return Response({'you are not following this user'})
-unfollow = UNFollowAPIView.as_view()
+unfollow = UNFollowAPIView.as_view()'''
 
 
+class SendEmailAPIView(APIView):
+    def post(self, request):
+        subject = request.data.get('subject')
+        message = request.data.get('message')
+        recipient_list = request.data.get('recipient_list',[])
+        send_email.delay(subject, message, recipient_list)
+        return Response({'email has been sent successfully'},status=200)
+send_email_view = SendEmailAPIView.as_view()

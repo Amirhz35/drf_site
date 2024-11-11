@@ -1,4 +1,4 @@
-#version: '3.8'
+version: '3.8'
 
 services:
   my_web:
@@ -11,8 +11,17 @@ services:
     env_file:
       - .env
     depends_on:
+      - rabbitmq
       - db
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"  
+      - "5672:5672"  
+    environment:
+      RABBITMQ_DEFAULT_USER: myuser
+      RABBITMQ_DEFAULT_PASS: mypassword
   db:
     image: postgres:13
     volumes:
@@ -21,6 +30,17 @@ services:
       - .env
     ports:
       - "5432:5432"
+
+  celery:
+    build: .
+    command: celery -A drf_site worker -l info --pool=solo
+    volumes:
+      - .:/app
+    working_dir: /app/DRF
+
+    depends_on:
+      - rabbitmq
+      - my_web
 
 volumes:
   postgres_data:
