@@ -10,6 +10,6 @@ urlpatterns = [
     path('followers',getfollowers),
     path('following',getfollowing),
     path('posts',getpost),
-    #path('unfollow',unfollow)
+    path('unfollow',unfollow),
     path('email',send_email_view)
 ]

@@ -53,7 +53,7 @@ class GetFollowingAPIView(
 '''
 
 class FollowAPIView(
-    GetFollowQuerySet,
+    #GetFollowQuerySet,
     PermissionMixins,
     APIView):
 
@@ -109,26 +109,6 @@ class GetPostsAPIView(
         return Response(serializer.data)
 getpost = GetPostsAPIView.as_view()
 
-'''class UNFollowAPIView(
-    #GetFollowQuerySet,
-    PermissionMixins,
-    generics.ListCreateAPIView):
-    queryset = Follow.objects.all()
-    serializer_class = FollowSerializer
-    def get_queryset(self):
-        return Follow.objects.filter(follower=self.request.user)
-    def perform_create(self,serializer):
-        following_user  = self.request.data.get('following')
-
-        try:
-            instance = Follow.objects.get(follower=self.request.user,following_id=following_user)
-            instance.delete()
-            return Response({'user unfollowed successfully'},status=200)
-        except Follow.DoesNotExist:
-            return Response({'you are not following this user'})
-unfollow = UNFollowAPIView.as_view()'''
-
-
 class SendEmailAPIView(APIView):
     def post(self, request):
         subject = request.data.get('subject')
@@ -137,3 +117,30 @@ class SendEmailAPIView(APIView):
         send_email.delay(subject, message, recipient_list)
         return Response({'email has been sent successfully'},status=200)
 send_email_view = SendEmailAPIView.as_view()
+
+class UNFollowAPIView(APIView):
+    def get_queryset(self):
+        return Follow.objects.filter(follower=self.request.user)
+    def get(self,request):
+        queryset = self.get_queryset()
+        serializers = FollowSerializer(queryset,many=True)
+        return Response(serializers.data,status=200)
+    def post(self,request):
+        following_user_id = request.data.get('following')
+        follower = request.user.id
+        
+        if not following_user_id:
+            return Response({'error': 'Following user ID is required'}, status=400)
+        
+        if follower == following_user_id:
+            return Response({'error': 'You cannot unfollow yourself'}, status=400)
+        
+        try:
+            instance = Follow.objects.get(follower=request.user, following_id=following_user_id)
+            instance.delete()
+            return Response({'message': 'User unfollowed successfully'}, status=200)
+        except Follow.DoesNotExist:
+            return Response({'error': 'You are not following this user'}, status=400)
+
+
+unfollow = UNFollowAPIView.as_view()
